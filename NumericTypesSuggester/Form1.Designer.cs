@@ -64,6 +64,7 @@
             MinValueTextBox.Name = "MinValueTextBox";
             MinValueTextBox.Size = new Size(711, 43);
             MinValueTextBox.TabIndex = 2;
+            MinValueTextBox.KeyPress += ChangeValueTextBox_KeyPress;
             // 
             // MaxValueTextBox
             // 
@@ -72,6 +73,7 @@
             MaxValueTextBox.Name = "MaxValueTextBox";
             MaxValueTextBox.Size = new Size(711, 43);
             MaxValueTextBox.TabIndex = 3;
+            MaxValueTextBox.KeyPress += ChangeValueTextBox_KeyPress;
             // 
             // IntegralOnlyCheckBox
             // 
@@ -98,6 +100,7 @@
             MustBePreciseCheckBox.TabIndex = 5;
             MustBePreciseCheckBox.Text = "Must be precise?";
             MustBePreciseCheckBox.UseVisualStyleBackColor = true;
+            MustBePreciseCheckBox.Visible = false;
             // 
             // ResultLabel
             // 
