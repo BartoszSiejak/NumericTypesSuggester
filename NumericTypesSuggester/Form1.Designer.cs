@@ -64,6 +64,7 @@
             MinValueTextBox.Name = "MinValueTextBox";
             MinValueTextBox.Size = new Size(711, 43);
             MinValueTextBox.TabIndex = 2;
+            MinValueTextBox.TextChanged += ValueTextBox_TextChanged;
             MinValueTextBox.KeyPress += ChangeValueTextBox_KeyPress;
             // 
             // MaxValueTextBox
@@ -73,6 +74,7 @@
             MaxValueTextBox.Name = "MaxValueTextBox";
             MaxValueTextBox.Size = new Size(711, 43);
             MaxValueTextBox.TabIndex = 3;
+            MaxValueTextBox.TextChanged += ValueTextBox_TextChanged;
             MaxValueTextBox.KeyPress += ChangeValueTextBox_KeyPress;
             // 
             // IntegralOnlyCheckBox
@@ -88,6 +90,7 @@
             IntegralOnlyCheckBox.TabIndex = 4;
             IntegralOnlyCheckBox.Text = "Integral only?";
             IntegralOnlyCheckBox.UseVisualStyleBackColor = true;
+            IntegralOnlyCheckBox.CheckedChanged += IntegralOnlyCheckBox_CheckedChanged;
             // 
             // MustBePreciseCheckBox
             // 
