@@ -5,6 +5,9 @@ namespace NumericTypesSuggester
 {
     public partial class MainForm : Form
     {
+        private BigInteger _minValue;
+        private BigInteger _maxValue;
+
         public MainForm()
         {
             InitializeComponent();
@@ -16,6 +19,7 @@ namespace NumericTypesSuggester
             {
                 e.Handled = true;
             }
+            GraphicalUserCommunicator.SetDefaultTextBoxColor(MaxValueTextBox);
         }
 
         private bool IsValidValue(char keyChar, TextBox textBox)
@@ -29,20 +33,23 @@ namespace NumericTypesSuggester
 
         private void ValueTextBox_TextChanged(object sender, EventArgs e)
         {
-            GraphicalUserCommunicator.SetDefaultTextBoxColor(MaxValueTextBox);
+            FindBestMatchingNumericType();
+        }
 
+        private void FindBestMatchingNumericType()
+        {
             if (CanICompare())
             {
-                var min = BigInteger.Parse(MinValueTextBox.Text);
-                var max = BigInteger.Parse(MaxValueTextBox.Text);
+                _minValue = BigInteger.Parse(MinValueTextBox.Text);
+                _maxValue = BigInteger.Parse(MaxValueTextBox.Text);
 
-                if (min > max)
+                if (_minValue > _maxValue)
                 {
                     GraphicalUserCommunicator.SetWarningTextBoxColor(MaxValueTextBox);
                 }
                 else
                 {
-                    Compare(min, max, IntegralOnlyCheckBox.Checked, MustBePreciseCheckBox.Checked);
+                    Compare(_minValue, _maxValue, IntegralOnlyCheckBox.Checked, MustBePreciseCheckBox.Checked);
                 }
             }
         }
@@ -76,12 +83,11 @@ namespace NumericTypesSuggester
 
             }
 
-            ResultLabel.Text = $"Suggested type: {result}";
+            GraphicalUserCommunicator.PrintMessage(result, ResultLabel);
         }
 
         private void IntegralOnlyCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-
             if (IntegralOnlyCheckBox.Checked is false)
             {
                 MustBePreciseCheckBox.Visible = true;
@@ -90,6 +96,13 @@ namespace NumericTypesSuggester
             {
                 MustBePreciseCheckBox.Visible = false;
             }
+
+            FindBestMatchingNumericType();
+        }
+
+        private void MustBePreciseCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            FindBestMatchingNumericType();
         }
     }
 
@@ -107,6 +120,12 @@ public static class GraphicalUserCommunicator
     {
         textBox.BackColor = Color.Red;
     }
+
+    public static void PrintMessage(string message, Label label)
+    {
+        label.Text = "Suggested type " + message;
+    }
+
 }
 
 public class TypesInfo
@@ -116,7 +135,7 @@ public class TypesInfo
         var minDecimal = new BigInteger(decimal.MinValue);
         var maxDecimal = new BigInteger(decimal.MaxValue);
        
-        if(min > minDecimal && max < maxDecimal )
+        if(min >= minDecimal && max <= maxDecimal )
         {
         return "decimal";
         }
@@ -128,37 +147,37 @@ public class TypesInfo
 
         if (min >= 0)
         {
-            if (max < byte.MaxValue)
+            if (max <= byte.MaxValue)
             {
                 return "byte";
             }
-            if (max < ushort.MaxValue)
+            if (max <= ushort.MaxValue)
             {
                 return "ushort";
             }
-            if (max < uint.MaxValue)
+            if (max <= uint.MaxValue)
             {
                 return "uint";
             }
-            if (max < ulong.MaxValue)
+            if (max <= ulong.MaxValue)
             {
                 return "ulong";
             }
         }
 
-        if (min > sbyte.MinValue && max < sbyte.MaxValue)
+        if (min >= sbyte.MinValue && max <= sbyte.MaxValue)
         {
             return "sbyte";
         }
-        if (min > short.MinValue && max < short.MaxValue)
+        if (min >= short.MinValue && max <= short.MaxValue)
         {
             return "short";
         }
-        if (min > int.MinValue && max < int.MaxValue)
+        if (min >= int.MinValue && max <= int.MaxValue)
         {
             return "int";
         }
-        if (min > long.MinValue && max < long.MaxValue)
+        if (min >= long.MinValue && max <= long.MaxValue)
         {
             return "long";
         }
@@ -171,14 +190,14 @@ public class TypesInfo
     {
         var minFloat = new BigInteger(float.MinValue);
         var maxFloat = new BigInteger(float.MaxValue);
-        if (min > minFloat && max < maxFloat)
+        if (min >= minFloat && max <= maxFloat)
         {
             return "float";
         }
         
         var minDouble = new BigInteger(double.MinValue);
         var maxDouble = new BigInteger(double.MaxValue);
-        if (min > minDouble && max < maxDouble)
+        if (min >= minDouble && max <= maxDouble)
         {
             return "double";
         }

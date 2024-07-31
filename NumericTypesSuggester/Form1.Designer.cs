@@ -104,6 +104,7 @@
             MustBePreciseCheckBox.Text = "Must be precise?";
             MustBePreciseCheckBox.UseVisualStyleBackColor = true;
             MustBePreciseCheckBox.Visible = false;
+            MustBePreciseCheckBox.CheckedChanged += MustBePreciseCheckBox_CheckedChanged;
             // 
             // ResultLabel
             // 
