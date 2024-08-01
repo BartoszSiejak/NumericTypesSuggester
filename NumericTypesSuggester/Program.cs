@@ -1,3 +1,7 @@
+using NumericTypesSuggester.NumericType;
+using NumericTypesSuggester.UserCommunication;
+using NumericTypesSuggester.Validation;
+
 namespace NumericTypesSuggester
 {
     internal static class Program
@@ -11,7 +15,10 @@ namespace NumericTypesSuggester
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new MainForm());
+            Application.Run(new MainForm(
+                new UserCommunicator(),
+                new Validator(),
+                new NumericTypeFinder()));
         }
     }
 }
