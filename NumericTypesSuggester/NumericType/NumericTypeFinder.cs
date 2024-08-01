@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NumericTypesSuggester.Mapping;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -7,107 +8,70 @@ using System.Threading.Tasks;
 
 namespace NumericTypesSuggester.NumericType
 {
-
-    public class NumericTypeFinder : INumericTypeFinder
+    public class NumericTypeFinder() : INumericTypeFinder
     {
+        private readonly RangeOfNumericTypesMapping _mapOfNumericTypes = new();
+
         public string FindOptimalNumericType(BigInteger min, BigInteger max, bool onlyIntegers = true, bool mustBePrecise = false)
         {
-            string result;
+            return onlyIntegers ? GetIntegerType(min, max) : GetFloatingType(min, max, mustBePrecise);
+        }
 
-            if (onlyIntegers)
+        string GetIntegerType(BigInteger min, BigInteger max)
+        {
+
+            List<string> integerTypes = min >= 0 ? ["byte", "ushort", "uint", "ulong"] : ["sbyte", "short", "int", "long"];
+
+            return GetOptimalTypeFromCollectionOrCustomString(integerTypes, min, max, "BigInteger");
+        }
+
+
+        string GetFloatingType(BigInteger min, BigInteger max, bool mustBePrecise)
+        {
+            if (mustBePrecise)
             {
-                result = GetIntegerType(min, max);
+                return GetOptimalTypeFromCollectionOrCustomString(["decimal"], min, max);
             }
             else
             {
-                if (mustBePrecise)
-                {
-                    result = GetFloatingPreciseType(min, max);
-                }
-                else
-                {
-                    result = GetFloatingType(min, max);
-                }
-
+                List<string> floatingTypes = ["float", "double"];
+                return GetOptimalTypeFromCollectionOrCustomString(floatingTypes, min, max);
             }
-            return result;
         }
 
-        static string GetFloatingPreciseType(BigInteger min, BigInteger max)
+        string GetOptimalTypeFromCollectionOrCustomString(IEnumerable<string> types, BigInteger min, BigInteger max, string valueIfNothingMatch = "Impossible representation")
         {
-            var minDecimal = new BigInteger(decimal.MinValue);
-            var maxDecimal = new BigInteger(decimal.MaxValue);
+            string? typeName = null;
 
-            if (min >= minDecimal && max <= maxDecimal)
+            foreach (var type in types)
             {
-                return "decimal";
+                typeName = IsNumberInRange(min, max, type) ? type : null;
+
+                if (typeName is not null)
+                {
+                    break;
+                }
             }
-            return "Impossible representation";
+            return typeName ?? valueIfNothingMatch;
         }
 
-        static string GetIntegerType(BigInteger min, BigInteger max)
+        bool IsNumberInRange(BigInteger minNumber, BigInteger maxNumber, string nameOfType)
         {
-
-            if (min >= 0)
+            if (minNumber > maxNumber)
             {
-                if (max <= byte.MaxValue)
-                {
-                    return "byte";
-                }
-                if (max <= ushort.MaxValue)
-                {
-                    return "ushort";
-                }
-                if (max <= uint.MaxValue)
-                {
-                    return "uint";
-                }
-                if (max <= ulong.MaxValue)
-                {
-                    return "ulong";
-                }
+                throw new ArgumentException($"{nameof(maxNumber)} number must be larger than {nameof(minNumber)} !");
+            }
+            if (!_mapOfNumericTypes.MinMaxValueOfTypes.ContainsKey(nameOfType))
+            {
+                throw new ArgumentException($"Invalid {nameof(nameOfType)} argument.");
             }
 
-            if (min >= sbyte.MinValue && max <= sbyte.MaxValue)
+            if (minNumber >= _mapOfNumericTypes.MinMaxValueOfTypes[nameOfType].Min && maxNumber <= _mapOfNumericTypes.MinMaxValueOfTypes[nameOfType].Max)
             {
-                return "sbyte";
-            }
-            if (min >= short.MinValue && max <= short.MaxValue)
-            {
-                return "short";
-            }
-            if (min >= int.MinValue && max <= int.MaxValue)
-            {
-                return "int";
-            }
-            if (min >= long.MinValue && max <= long.MaxValue)
-            {
-                return "long";
+                return true;
             }
 
-            return "BigInteger";
-
-        }
-
-        static string GetFloatingType(BigInteger min, BigInteger max)
-        {
-            var minFloat = new BigInteger(float.MinValue);
-            var maxFloat = new BigInteger(float.MaxValue);
-            if (min >= minFloat && max <= maxFloat)
-            {
-                return "float";
-            }
-
-            var minDouble = new BigInteger(double.MinValue);
-            var maxDouble = new BigInteger(double.MaxValue);
-            if (min >= minDouble && max <= maxDouble)
-            {
-                return "double";
-            }
-
-
-            return "Impossible representation";
-
+            return false;
         }
     }
 }
