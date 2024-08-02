@@ -15,7 +15,7 @@ namespace NumericTypesSuggester.Validation
             {
                 return char.IsControl(keyChar) ||
                     char.IsDigit(keyChar) ||
-                    (char.Equals(keyChar, '-') && textBox.Text == string.Empty);
+                    (char.Equals(keyChar, '-') && textBox.SelectionStart == 0);
             }
         }
 

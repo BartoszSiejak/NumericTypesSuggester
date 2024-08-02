@@ -12,9 +12,6 @@ namespace NumericTypesSuggester
         private readonly IValidator _formValidation;
         private readonly INumericTypeFinder _numericTypeFinder;
 
-        private BigInteger _minValue;
-        private BigInteger _maxValue;
-
         public MainForm(IUserCommunication userCommunicator, IValidator formValidation, INumericTypeFinder numericTypeFinder)
         {
             InitializeComponent();
@@ -29,55 +26,45 @@ namespace NumericTypesSuggester
             {
                 e.Handled = true;
             }
-            _userCommunicator.SetDefaultTextBoxColor(MaxValueTextBox);
         }
 
         private void ValueTextBox_TextChanged(object sender, EventArgs e)
         {
-            LookTypeAfterChange();
+            OnChangeNumber();
         }
 
         private void IntegralOnlyCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            if (IntegralOnlyCheckBox.Checked is false)
-            {
-                MustBePreciseCheckBox.Visible = true;
-            }
-            else
-            {
-                MustBePreciseCheckBox.Visible = false;
-            }
-
-            LookTypeAfterChange();
+            MustBePreciseCheckBox.Visible = !IntegralOnlyCheckBox.Checked;
+            OnChangeNumber();
         }
 
         private void MustBePreciseCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            LookTypeAfterChange();
+            OnChangeNumber();
         }
 
-        private void LookTypeAfterChange()
+        private void OnChangeNumber()
         {
             if (_formValidation.IsValidNumberToConvert(MinValueTextBox.Text) && _formValidation.IsValidNumberToConvert(MaxValueTextBox.Text))
             {
-                _minValue = BigInteger.Parse(MinValueTextBox.Text);
-                _maxValue = BigInteger.Parse(MaxValueTextBox.Text);
+                var minValue = BigInteger.Parse(MinValueTextBox.Text);
+                var maxValue = BigInteger.Parse(MaxValueTextBox.Text);
 
-                if (_minValue > _maxValue)
+                if (minValue > maxValue)
                 {
                     _userCommunicator.SetWarningTextBoxColor(MaxValueTextBox);
-                    _userCommunicator.PrintMessage("not enough data", ResultLabel);
                 }
                 else
                 {
-                    var result = _numericTypeFinder.FindOptimalNumericType(_minValue, _maxValue, IntegralOnlyCheckBox.Checked, MustBePreciseCheckBox.Checked);
+                    var result = _numericTypeFinder.FindOptimalNumericType(minValue, maxValue, IntegralOnlyCheckBox.Checked, MustBePreciseCheckBox.Checked);
                     _userCommunicator.PrintMessage(result, ResultLabel);
+                    _userCommunicator.SetDefaultTextBoxColor(MaxValueTextBox);
+                    return;
                 }
             }
-            else
-            {
-                _userCommunicator.PrintMessage("not enough data", ResultLabel);
-            }
+
+                _userCommunicator.PrintMessage("not enough data", ResultLabel);          
         }
     }
 }
