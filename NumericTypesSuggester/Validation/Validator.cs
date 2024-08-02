@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace NumericTypesSuggester.Validation
 {
 
-    public class Validator: IValidator
+    public class Validator : IValidator
     {
         public bool IsValidInputChar(char keyChar, TextBox textBox)
         {
@@ -21,8 +21,7 @@ namespace NumericTypesSuggester.Validation
 
         public bool IsValidNumberToConvert(string number)
         {
-            var canIParse = BigInteger.TryParse(number, out _);
-            return number != string.Empty && canIParse;
+            return number != string.Empty && BigInteger.TryParse(number, out _);
         }
     }
 }
